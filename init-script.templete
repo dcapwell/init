@@ -23,6 +23,7 @@ if [ -e /etc/default/{{PATH_NAME}} ]; then
   . /etc/default/{{PATH_NAME}}
 fi
 
+# if these are not defined, default to the given values
 export {{EXPORT_NAME}}_HOME=${{{EXPORT_NAME}}_HOME:-/usr/lib/{{PATH_NAME}}}
 export {{EXPORT_NAME}}_CONF_DIR=${{{EXPORT_NAME}}_CONF_DIR:-/etc/{{PATH_NAME}}}
 export {{EXPORT_NAME}}_LOG_DIR=${{{EXPORT_NAME}}_LOG_DIR:-/var/log/{{PATH_NAME}}}
@@ -30,6 +31,7 @@ export {{EXPORT_NAME}}_OPTS=${{{EXPORT_NAME}}_OPTS:-""}
 export {{EXPORT_NAME}}_PID_FILE=${{{EXPORT_NAME}}_PID_FILE:-"/var/run/{{PATH_NAME}}.pid"}
 export {{EXPORT_NAME}}_NICENESS=${{{EXPORT_NAME}}_NICENESS:-+0}
 
+# used to lock more processes from starting
 LOCK_NAME="{{PATH_NAME}}"
 LOCKFILE="/var/lock/subsys/${LOCK_NAME}"
 
@@ -53,7 +55,7 @@ start_agent() {
   JAVA=$JAVA_HOME/bin/java
 
   # execute {{NAME}} process
-  CMD="$JAVA ${{EXPORT_NAME}}_OPTS -cp ${{EXPORT_NAME}}_CONF_DIR:${{EXPORT_NAME}}_HOME/*:${{EXPORT_NAME}}_HOME/lib/* {{CLASS_NAME}} > ${{EXPORT_NAME}}_LOG_DIR/{{PATH_NAME}}-stdout.log 2>&1 &"
+  CMD="$JAVA ${{EXPORT_NAME}}_OPTS -cp ${{EXPORT_NAME}}_CONF_DIR:${{EXPORT_NAME}}_HOME/*:${{EXPORT_NAME}}_HOME/lib/* {{CLASS_NAME}} > ${{EXPORT_NAME}}_LOG_DIR/{{PATH_NAME}}-stdouterr.log 2>&1 &"
   daemon ${{EXPORT_NAME}}_NICENESS --user {{RUN_AS}} --pidfile ${{EXPORT_NAME}}_PID_FILE "$CMD"
 
   # check if was able to start the process, if pid file exists then nothing happens but RETVAL will be 0
