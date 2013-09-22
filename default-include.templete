@@ -44,7 +44,7 @@ OPTS=(
 #-XX:+UseBiasedLocking                               ## speed up uncontended locks
 #-XX:NewRatio=2                                      ## set eden/survivor spaces to 1/3rd of heap
 #-XX:+HeapDumpOnOutOfMemoryError                     ## dump the heap if we run out of memory
-#-XX:HeapDumpPath=${{EXPORT_NAME}}_LOG_DIR                 ## dump the heap to $PWD
+#-XX:HeapDumpPath=${{EXPORT_NAME}}_LOG_DIR           ## dump the heap to $PWD
 #-XX:+PrintGC                                        ## do extended GC logging
 #-Xloggc:${{{EXPORT_NAME}}_LOG_DIR}/gc.log
 #-XX:+PrintGCDetails
