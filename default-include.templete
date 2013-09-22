@@ -16,15 +16,36 @@ export {{EXPORT_NAME}}_OPTS=""
 export {{EXPORT_NAME}}_PID_FILE="/var/run/{{PATH_NAME}}.pid"
 export {{EXPORT_NAME}}_NICENESS=+0
 
-MAC_OSX=false
 case "`uname`" in
-Darwin*) MAC_OSX=true;;
+  Linux)
+    system_memory_in_mb=`free -m | awk '/Mem:/ {print $2}'`
+    system_cpu_cores=`egrep -c 'processor([[:space:]]+):.*' /proc/cpuinfo`
+  ;;
+  FreeBSD)
+    system_memory_in_bytes=`sysctl hw.physmem | awk '{print $2}'`
+    system_memory_in_mb=`expr $system_memory_in_bytes / 1024 / 1024`
+    system_cpu_cores=`sysctl hw.ncpu | awk '{print $2}'`
+  ;;
+  SunOS)
+    system_memory_in_mb=`prtconf | awk '/Memory size:/ {print $3}'`
+    system_cpu_cores=`psrinfo | wc -l`
+  ;;
+  Darwin)
+    system_memory_in_bytes=`sysctl hw.memsize | awk '{print $2}'`
+    system_memory_in_mb=`expr $system_memory_in_bytes / 1024 / 1024`
+    system_cpu_cores=`sysctl hw.ncpu | awk '{print $2}'`
+  ;;
+  *)
+    # assume reasonable defaults for e.g. a modern desktop or
+    # cheap server
+    system_memory_in_mb="2048"
+    system_cpu_cores="2"
+  ;;
 esac
 
-if $MAC_OSX; then
-  num_cpus=`sysctl hw.ncpu | awk '{print $2}'`
-else
-  num_cpus=`nproc`
+# some systems like the raspberry pi don't report cores, use at least 1
+if [ "$system_cpu_cores" -lt "1" ]; then
+  system_cpu_cores="1"
 fi
 
 OPTS=(
@@ -42,6 +63,7 @@ OPTS=(
 #-XX:+UseFastAccessorMethods                         ## be sure to inline simple accessor methods
 #-XX:+UseBiasedLocking                               ## speed up uncontended locks
 #-XX:NewRatio=2                                      ## set eden/survivor spaces to 1/3rd of heap
+#-XX:SurvivorRatio=8                                 ## set survivor space 1/8th of new gen
 #-XX:+HeapDumpOnOutOfMemoryError                     ## dump the heap if we run out of memory
 #-XX:HeapDumpPath=${{EXPORT_NAME}}_LOG_DIR           ## dump the heap to $PWD
 #-XX:+PrintGC                                        ## do extended GC logging
