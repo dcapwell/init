@@ -6,6 +6,8 @@
 # Installed at /etc/default/{{PATH_NAME}}
 # Exports environment variables needed by the {{PATH_NAME}} script at runtime
 #
+# Generated at: {{DATE}}
+#
 ###########################################################################
 
 export {{EXPORT_NAME}}_HOME="/usr/lib/{{PATH_NAME}}"

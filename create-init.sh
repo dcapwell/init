@@ -36,8 +36,10 @@ if [ -z "$name" -o -z "$class_name" -o -z "$run_as" ]; then
   show_help "Not all arguments defined"
 fi
 
+date=$(date)
+
 function replace() {
-  sed "s/{{NAME}}/$name/g" | sed "s/{{PATH_NAME}}/$path_name/g" | sed "s/{{EXPORT_NAME}}/$export_name/g" | sed "s/{{CLASS_NAME}}/$class_name/g" | sed "s/{{RUN_AS}}/$run_as/g"
+  sed "s/{{NAME}}/$name/g" | sed "s/{{PATH_NAME}}/$path_name/g" | sed "s/{{EXPORT_NAME}}/$export_name/g" | sed "s/{{CLASS_NAME}}/$class_name/g" | sed "s/{{RUN_AS}}/$run_as/g" | sed "s/{{DATE}}/$date/g"
 }
 
 cat init-script.templete | replace > $path_name.init
