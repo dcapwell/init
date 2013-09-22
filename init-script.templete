@@ -7,7 +7,7 @@
 # Usage:
 # service {{PATH_NAME}} (start|stop|restart|status)
 #
-# chkconfig: 2345 90 10
+# chkconfig: 345 90 10
 # description: {{NAME}}
 #
 ###############################################################################################################
