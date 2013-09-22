@@ -16,3 +16,53 @@ export {{EXPORT_NAME}}_LOG_DIR="/var/log/{{PATH_NAME}}"
 export {{EXPORT_NAME}}_OPTS=""
 export {{EXPORT_NAME}}_PID_FILE="/var/run/{{PATH_NAME}}.pid"
 export {{EXPORT_NAME}}_NICENESS=+0
+
+MAC_OSX=false
+case "`uname`" in
+Darwin*) MAC_OSX=true;;
+esac
+
+if $MAC_OSX; then
+  num_cpus=`sysctl hw.ncpu | awk '{print $2}'`
+else
+  num_cpus=`nproc`
+fi
+
+OPTS=(
+#-Xmx32m                                             ## limit memory to as small as possible
+#-Xms32m                                             ## limit memory to as small as possible
+#-ea                                                 ## enable assert checks
+#-server                                             ## make sure we're using the 64-bit server VM
+#-d64
+#-Djava.net.preferIPv4Stack=true                     ## we don't use ipv6, so cut it out of the loop
+#-XX:+UseCompressedOops                              ## use 32-bit pointers to reduce heap usage
+#-XX:+UseParNewGC                                    ## use parallel GC for the new generation
+#-XX:+UseConcMarkSweepGC                             ## use concurrent mark-and-sweep for the old generation
+#-XX:+CMSParallelRemarkEnabled                       ## use multiple threads for the remark phase
+#-XX:+AggressiveOpts                                 ## use the latest and greatest in JVM tech
+#-XX:+UseFastAccessorMethods                         ## be sure to inline simple accessor methods
+#-XX:+UseBiasedLocking                               ## speed up uncontended locks
+#-XX:NewRatio=2                                      ## set eden/survivor spaces to 1/3rd of heap
+#-XX:+HeapDumpOnOutOfMemoryError                     ## dump the heap if we run out of memory
+#-XX:HeapDumpPath=${{EXPORT_NAME}}_LOG_DIR                 ## dump the heap to $PWD
+#-XX:+PrintGC                                        ## do extended GC logging
+#-Xloggc:${{{EXPORT_NAME}}_LOG_DIR}/gc.log
+#-XX:+PrintGCDetails
+#-XX:+PrintHeapAtGC
+#-XX:+PrintGCTimeStamps
+#-XX:GCLogFileSize=20M
+#-XX:NumberOfGCLogFiles=15
+#-XX:+UseGCLogFileRotation
+#-XX:+PrintGCDateStamps
+#-XX:+PrintPromotionFailure
+#-XX:-ReduceInitialCardMarks                         ## might prevent a SEGV error
+#-XX:MaxPermSize=40m                                 ## limit perm gen space
+#-XX:+CMSClassUnloadingEnabled                       ## clean up perm gen
+#-XX:+CMSPermGenSweepingEnabled                      ## clean up perm gen
+#-Dcom.sun.management.jmxremote                      ## enable jxm
+#-Dcom.sun.management.jmxremote.ssl=false
+#-Dcom.sun.management.jmxremote.port=7532
+#-Dcom.sun.management.jmxremote.authenticate=false
+#-Djava.rmi.server.hostname=`hostname -i`            ## you might need to switch this to a public hostname that your client is able to resolve
+)
+export {{EXPORT_NAME}}_OPTS="${{EXPORT_NAME}}_OPTS ${OPTS[@]}"
