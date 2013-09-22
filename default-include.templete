@@ -1,0 +1,16 @@
+#!/bin/bash
+
+
+###########################################################################
+#
+# Installed at /etc/default/{{PATH_NAME}}
+# Exports environment variables needed by the {{PATH_NAME}} script at runtime
+#
+###########################################################################
+
+export {{EXPORT_NAME}}_HOME="/usr/lib/{{PATH_NAME}}"
+export {{EXPORT_NAME}}_CONF_DIR="/etc/{{PATH_NAME}}"
+export {{EXPORT_NAME}}_LOG_DIR="/var/log/{{PATH_NAME}}"
+export {{EXPORT_NAME}}_OPTS=""
+export {{EXPORT_NAME}}_PID_FILE="/var/run/{{PATH_NAME}}.pid"
+export {{EXPORT_NAME}}_NICENESS=+0
